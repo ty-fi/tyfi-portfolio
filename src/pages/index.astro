@@ -1,0 +1,225 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import authorData from '../content/author/tyler.json';
+
+const url = new URL(Astro.request.url);
+const templateParam = url.searchParams.get('tpl');
+const template: 'a' | 'b' | 'c' | 'd' = templateParam === 'b' ? 'b' : templateParam === 'c' ? 'c' : templateParam === 'd' ? 'd' : 'a';
+
+const allWork = await getCollection('work');
+const allPress = await getCollection('press');
+
+const featured = allWork
+  .filter((w) => w.data.featured)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 4);
+
+const recent = allWork
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 8);
+
+const recentPress = allPress
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Base
+  title={`${authorData.name} — ${authorData.headline}`}
+  description={authorData.bio_short}
+  template={template}
+>
+  {template === 'a' && (
+    <div class="container">
+      <section class="hero">
+        <div class="eyebrow">Energy research · Expert testimony</div>
+        <h1>{authorData.bio_short.split('.')[0]}.</h1>
+        <p class="lede">{authorData.bio_long.split('\n\n')[0]}</p>
+        <p style="margin-top: 1.5rem;">
+          <a href="/work">View work →</a>
+          &nbsp;&nbsp;
+          <a href="/about">About</a>
+          &nbsp;&nbsp;
+          <a href="/contact">Get in touch</a>
+        </p>
+      </section>
+
+      <section style="margin-bottom: 4rem;">
+        <div class="section-heading">
+          <h2>Featured work</h2>
+          <a class="more" href="/work">All work</a>
+        </div>
+        <ul class="work-list">
+          {featured.map((w) => (
+            <li class="work-item">
+              <div class="date">{w.data.date.getFullYear()}</div>
+              <div>
+                <h3><a href={`/work/${w.slug}`}>{w.data.title}</a></h3>
+                <p class="summary">{w.data.summary}</p>
+                <div class="work-meta">
+                  {w.data.employer}{w.data.jurisdiction && ` · ${w.data.jurisdiction}`}{w.data.docket_no && ` · ${w.data.docket_no}`}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {recentPress.length > 0 && (
+        <section style="margin-bottom: 4rem;">
+          <div class="section-heading">
+            <h2>In the press</h2>
+            <a class="more" href="/press">All press</a>
+          </div>
+          <ul class="press-list">
+            {recentPress.map((p) => (
+              <li class="press-item">
+                <div class="press-head">
+                  <h3><a href={p.data.url}>{p.data.title}</a></h3>
+                  <span class="date">{fmt(p.data.date)}</span>
+                </div>
+                <div class="outlet">{p.data.outlet}</div>
+                {p.data.quote && <div class="quote">{p.data.quote}</div>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  )}
+
+  {template === 'b' && (
+    <div class="container">
+      <section class="hero">
+        <h1>Hi, I'm Tyler.</h1>
+        <p class="lede">I'm an energy researcher and expert witness focused on resource planning, rate design, climate risk, and the clean energy transition in the U.S. Southeast. Currently a manager at <a href="https://rmi.org/bios/tyler-fitch/">RMI</a>.</p>
+        <p style="margin-top: 1.5rem; color: var(--b-ink-soft); font-size: 0.875rem;">
+          <a href="/work">Work</a> · <a href="/press">Press</a> · <a href="/about">About</a> · <a href="/contact">Contact</a>
+        </p>
+      </section>
+
+      <section style="margin-bottom: 3rem;">
+        <div class="section-heading">Recent work</div>
+        <ul class="feed">
+          {recent.map((w) => (
+            <li>
+              <span class="date">{fmt(w.data.date)}</span>
+              <span class="title"><a href={`/work/${w.slug}`}>{w.data.title}</a></span>
+              <span class="tag">— {w.data.type}{w.data.jurisdiction ? ` · ${w.data.jurisdiction}` : ''}</span>
+              <span class="summary">{w.data.summary}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {recentPress.length > 0 && (
+        <section style="margin-bottom: 3rem;">
+          <div class="section-heading">In the press</div>
+          <ul class="feed">
+            {recentPress.map((p) => (
+              <li>
+                <span class="date">{fmt(p.data.date)}</span>
+                <span class="title"><a href={p.data.url}>{p.data.title}</a></span>
+                <span class="tag">— {p.data.outlet}</span>
+                {p.data.quote && <span class="summary">"{p.data.quote}"</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  )}
+
+  {template === 'c' && (
+    <div class="container">
+      <section class="hero">
+        <h1>{authorData.name}</h1>
+        <p class="lede">{authorData.bio_short}</p>
+      </section>
+
+      <h2>Selected Work</h2>
+      <ul class="citation-list">
+        {recent.map((w) => (
+          <li class="citation-item">
+            <span class="year">{w.data.date.getFullYear()}</span>
+            <span>
+              <span class="title"><a href={`/work/${w.slug}`}>{w.data.title}</a></span>
+              <span class="where"> — {w.data.employer}{w.data.jurisdiction ? `, ${w.data.jurisdiction}` : ''}{w.data.docket_no ? `, ${w.data.docket_no}` : ''}.</span>
+              <span class="summary">{w.data.summary}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {recentPress.length > 0 && (
+        <>
+          <h2>Press & Citations</h2>
+          <ul class="citation-list">
+            {recentPress.map((p) => (
+              <li class="citation-item">
+                <span class="year">{p.data.date.getFullYear()}</span>
+                <span>
+                  <span class="title"><a href={p.data.url}>{p.data.title}</a></span>
+                  <span class="where"> — {p.data.outlet}, {fmt(p.data.date)}.</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  )}
+
+  {template === 'd' && (
+    <div class="container">
+      <section class="hero">
+        <pre class="ascii-title" aria-hidden="true">{`┌─┐┬ ┬┌─┐┌─┐┬  ┌─┐
+└─┐│ ││ ││ ││  │ │
+└─┘└─┘└─┘└─┘┴─┘└─┘`}</pre>
+        <h1 class="hero-name">Tyler Fitch</h1>
+        <p class="lede">// {authorData.bio_short}</p>
+        <p class="lede" style="margin-top: 0.75rem; color: var(--d-muted); font-style: normal;">
+          &gt; <a href="/work">/work</a> &nbsp; <a href="/press">/press</a> &nbsp; <a href="/about">/about</a> &nbsp; <a href="/contact">/contact</a>
+        </p>
+      </section>
+
+      <section class="block">
+        <div class="filter-label">// featured</div>
+        <div class="masonry">
+          {featured.map((w) => (
+            <a href={`/work/${w.slug}`} class="masonry-card" data-kind={w.data.type}>
+              <div class="card-kind">{w.data.type}</div>
+              <h3 class="card-title">{w.data.title}</h3>
+              <div class="card-meta">
+                {w.data.employer}{w.data.jurisdiction && ` · ${w.data.jurisdiction}`}
+              </div>
+              <p class="card-summary">{w.data.summary}</p>
+              <div class="card-tags">
+                {w.data.categories.slice(0, 3).map((c) => <span class="card-tag">#{c}</span>)}
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {recentPress.length > 0 && (
+        <section class="block">
+          <div class="filter-label">// press</div>
+          <ul class="terminal-list">
+            {recentPress.map((p) => (
+              <li>
+                <span class="date">{fmt(p.data.date)}</span>
+                <a href={p.data.url} class="title">{p.data.title}</a>
+                <span class="meta"> — {p.data.outlet}</span>
+                {p.data.quote && <blockquote class="quote">{p.data.quote}</blockquote>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  )}
+</Base>

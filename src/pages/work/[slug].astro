@@ -1,0 +1,234 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const work = await getCollection('work');
+  return work.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry, allWork: work },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  allWork: CollectionEntry<'work'>[];
+}
+
+const { entry, allWork } = Astro.props;
+const { Content } = await entry.render();
+const url = new URL(Astro.request.url);
+const template: 'a' | 'b' | 'c' | 'd' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : url.searchParams.get('tpl') === 'd' ? 'd' : 'a';
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const typeLabel: Record<string, string> = {
+  testimony: 'Expert testimony',
+  report: 'Report',
+  'white-paper': 'White paper',
+  brief: 'Brief',
+  article: 'Article',
+  thesis: 'Thesis',
+  comment: 'Public comment',
+};
+
+// ── Backlinks: scan every other work's body for [[this-slug]] references ──
+const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
+
+function extractBacklinks(source: string): { slug: string; display: string }[] {
+  const out: { slug: string; display: string }[] = [];
+  for (const match of source.matchAll(WIKILINK_RE)) {
+    const inner = match[1].trim();
+    const [slugOrText, displayText] = inner.split('|').map((s) => s.trim());
+    const slug = slugOrText;
+    const display = displayText || slugOrText;
+    out.push({ slug, display });
+  }
+  return out;
+}
+
+// Helper: extract wikilink text from frontmatter + body, joined into a single string.
+function getSearchableText(entry: CollectionEntry<'work'>): string {
+  const parts: string[] = [];
+  parts.push((entry.body || '') as string);
+  // Include all string-valued frontmatter fields so wikilinks in summary,
+  // title, etc. are picked up.
+  for (const value of Object.values(entry.data)) {
+    if (typeof value === 'string') parts.push(value);
+  }
+  // Also include array-of-strings (like categories, topics, coauthors)
+  for (const value of Object.values(entry.data)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string') parts.push(item);
+      }
+    }
+  }
+  return parts.join('\n');
+}
+
+const backlinks = allWork
+  .filter((w) => w.slug !== entry.slug)
+  .map((w) => {
+    const refs = extractBacklinks(getSearchableText(w));
+    const matching = refs.filter((r) => r.slug === entry.slug);
+    return { source: w, refs: matching };
+  })
+  .filter((b) => b.refs.length > 0);
+---
+
+<Base
+  title={`${entry.data.title} — Tyler Fitch`}
+  description={entry.data.summary}
+  template={template}
+>
+  <div class="container">
+    <article class="work-detail">
+      <a href="/work" class="back">← All work</a>
+      <header>
+        <h1>{entry.data.title}</h1>
+        <p class="lead" style={template === 'a' ? 'font-style: italic; color: var(--a-ink-soft);' : ''}>{entry.data.summary}</p>
+      </header>
+
+      <dl class="work-facts">
+        <div>
+          <dt>Type</dt>
+          <dd>{typeLabel[entry.data.type] || entry.data.type}</dd>
+        </div>
+        <div>
+          <dt>Date</dt>
+          <dd>{fmt(entry.data.date)}</dd>
+        </div>
+        {entry.data.employer && (
+          <div>
+            <dt>Author / Employer</dt>
+            <dd>{entry.data.employer}</dd>
+          </div>
+        )}
+        {entry.data.client && entry.data.client !== entry.data.employer && (
+          <div>
+            <dt>Client</dt>
+            <dd>{entry.data.client}</dd>
+          </div>
+        )}
+        {entry.data.jurisdiction && (
+          <div>
+            <dt>Jurisdiction</dt>
+            <dd>{entry.data.jurisdiction}</dd>
+          </div>
+        )}
+        {entry.data.docket_no && (
+          <div>
+            <dt>Docket</dt>
+            <dd>{entry.data.docket_no}</dd>
+          </div>
+        )}
+        {entry.data.coauthors.length > 0 && (
+          <div>
+            <dt>Coauthors</dt>
+            <dd>{entry.data.coauthors.join(', ')}</dd>
+          </div>
+        )}
+      </dl>
+
+      {entry.data.topics.length > 0 && (
+        <div style="margin-bottom: 2rem;">
+          <ul class="topic-list">
+            {entry.data.topics.map((t) => <li class="topic">{t}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {entry.data.categories.length > 0 && (
+        <div style="margin-bottom: 2rem;">
+          <div class="filter-label" style="margin-bottom: 0.4rem; color: var(--a-ink-soft);">Categories</div>
+          <div class="work-categories">
+            {entry.data.categories.map((c) => <span class="category-tag">#{c}</span>)}
+          </div>
+        </div>
+      )}
+
+      <div class="work-body">
+        <Content />
+      </div>
+
+      {backlinks.length > 0 && (
+        <section class="backlinks" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--a-rule, #c9bda3);">
+          <h2 class="backlinks-heading">Referenced by</h2>
+          <p style="color: var(--a-ink-soft); font-size: 0.9375rem; margin-bottom: 1rem;">
+            These other works link to this one with <code>[[{entry.slug}]]</code>:
+          </p>
+          <ul class="backlink-list">
+            {backlinks.map(({ source, refs }) => (
+              <li>
+                <a href={`/work/${source.slug}`}>{source.data.title}</a>
+                {refs.length > 0 && refs[0].display !== source.slug && (
+                  <span class="backlink-context" style="color: var(--a-ink-soft); font-size: 0.875rem;"> — as "{refs[0].display}"</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div style="margin-top: 3rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+        {entry.data.pdf_url && (
+          <a href={entry.data.pdf_url} class="dl-btn">Download PDF</a>
+        )}
+        {entry.data.canonical_url && (
+          <a href={entry.data.canonical_url}>View canonical source →</a>
+        )}
+      </div>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .dl-btn {
+    display: inline-block;
+    padding: 0.625rem 1.25rem;
+    background: var(--a-accent, #2c4a3e);
+    color: #fff !important;
+    border: none !important;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-family: var(--a-sans, system-ui);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .dl-btn:hover { background: var(--a-accent-soft, #3d6451); }
+
+  .work-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  .category-tag {
+    font-family: var(--a-sans, system-ui);
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    background: var(--a-bg-soft, #ede5d3);
+    color: var(--a-accent, #2c4a3e);
+    border-radius: 1rem;
+  }
+
+  .backlinks-heading {
+    font-family: var(--a-sans, system-ui);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--a-ink-soft, #4a4a4a);
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+  }
+  .backlink-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .backlink-list li {
+    padding: 0.375rem 0;
+    border-bottom: 1px dashed var(--a-rule, #c9bda3);
+  }
+  .backlink-list li:last-child { border-bottom: 0; }
+</style>

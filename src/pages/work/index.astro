@@ -1,0 +1,141 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const url = new URL(Astro.request.url);
+const template: 'a' | 'b' | 'c' | 'd' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : url.searchParams.get('tpl') === 'd' ? 'd' : 'a';
+
+const allWork = await getCollection('work');
+const sorted = allWork.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Distinct values for filters
+const types = Array.from(new Set(allWork.map((w) => w.data.type))).sort();
+const categories = Array.from(new Set(allWork.flatMap((w) => w.data.categories))).sort();
+const jurisdictions = Array.from(new Set(allWork.map((w) => w.data.jurisdiction).filter(Boolean))) as string[];
+const employers = Array.from(new Set(allWork.map((w) => w.data.employer).filter(Boolean))) as string[];
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Base
+  title="Work"
+  description="Expert testimony, reports, white papers, and articles by Tyler Fitch."
+  template={template}
+>
+  <div class="container">
+    <section style="margin-bottom: 2rem;">
+      <h1>Work</h1>
+      <p style="color: var(--a-ink-soft); max-width: 32rem; margin-top: 0.5rem;">
+        Expert testimony, reports, and analysis on utility resource planning, rate design, climate risk, and the clean energy transition in the U.S. Southeast.
+      </p>
+    </section>
+
+    <div class="tabs" data-tabs data-mode="type">
+      <button class="active" data-tab="all">All ({sorted.length})</button>
+      {types.map((t) => (
+        <button data-tab={t}>{t} ({sorted.filter((w) => w.data.type === t).length})</button>
+      ))}
+    </div>
+
+    {categories.length > 0 && (
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.5rem;">By category</div>
+        <div class="filter-bar" data-filter data-field="category">
+          <button class="chip active" data-value="">All</button>
+          {categories.map((c) => (
+            <button class="chip" data-value={c}>{c}</button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {jurisdictions.length > 0 && (
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.5rem;">By jurisdiction</div>
+        <div class="filter-bar" data-filter data-field="jurisdiction">
+          <button class="chip active" data-value="">All</button>
+          {jurisdictions.map((j) => (
+            <button class="chip" data-value={j}>{j}</button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {employers.length > 0 && (
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.5rem;">By employer</div>
+        <div class="filter-bar" data-filter data-field="employer">
+          <button class="chip active" data-value="">All</button>
+          {employers.map((e) => (
+            <button class="chip" data-value={e}>{e}</button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <ul class="work-list" data-list>
+      {sorted.map((w) => (
+        <li
+          class="work-item"
+          data-type={w.data.type}
+          data-category={(w.data.categories || []).join('|')}
+          data-jurisdiction={w.data.jurisdiction || ''}
+          data-employer={w.data.employer || ''}
+        >
+          <div class="date">{fmt(w.data.date)}</div>
+          <div>
+            <h3><a href={`/work/${w.slug}`}>{w.data.title}</a></h3>
+            <p class="summary">{w.data.summary}</p>
+            <div class="work-meta">
+              {w.data.employer}{w.data.jurisdiction && ` · ${w.data.jurisdiction}`}{w.data.docket_no && ` · ${w.data.docket_no}`}
+            </div>
+            {w.data.categories.length > 0 && (
+              <div class="work-categories">
+                {w.data.categories.map((c) => <span class="category-tag">#{c}</span>)}
+              </div>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<script>
+  const state = { tab: 'all', category: '', jurisdiction: '', employer: '' };
+
+  const applyFilters = () => {
+    document.querySelectorAll('[data-list] .work-item').forEach((el) => {
+      const t = el.getAttribute('data-type');
+      const cats = (el.getAttribute('data-category') || '').split('|').filter(Boolean);
+      const j = el.getAttribute('data-jurisdiction');
+      const e = el.getAttribute('data-employer');
+      const okType = state.tab === 'all' || t === state.tab;
+      const okCat = !state.category || cats.includes(state.category);
+      const okJur = !state.jurisdiction || j === state.jurisdiction;
+      const okEmp = !state.employer || e === state.employer;
+      (el as HTMLElement).style.display = okType && okCat && okJur && okEmp ? '' : 'none';
+    });
+  };
+
+  document.querySelectorAll('[data-tabs] button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-tabs] button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.tab = (btn as HTMLElement).getAttribute('data-tab') || 'all';
+      applyFilters();
+    });
+  });
+
+  document.querySelectorAll('[data-filter]').forEach((group) => {
+    const field = (group as HTMLElement).getAttribute('data-field') as keyof typeof state;
+    group.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state[field] = (btn as HTMLElement).getAttribute('data-value') || '';
+        applyFilters();
+      });
+    });
+  });
+</script>

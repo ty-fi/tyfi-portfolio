@@ -1,0 +1,68 @@
+{
+  "name": "Tyler Fitch",
+  "headline": "Energy research, expert testimony, and analysis for a clean and just energy transition.",
+  "location": "Southeast United States",
+  "current_role": {
+    "org": "RMI (Rocky Mountain Institute)",
+    "title": "Manager, Carbon-Free Electricity Practice",
+    "url": "https://rmi.org/bios/tyler-fitch/"
+  },
+  "bio_short": "Tyler Fitch is an energy researcher and expert witness focused on resource planning, rate design, climate risk, and the clean energy transition in the U.S. Southeast. He has provided expert testimony in North Carolina, South Carolina, Virginia, and Georgia.",
+  "bio_long": "Tyler Fitch is a manager in RMI's Carbon-Free Electricity Practice, where he leads analysis and collaboration to build a vision for a just, carbon-free electricity system. His work takes a close look at how we plan to generate, transmit, and distribute power, and develops improvements to catalyze the deployment of affordable, reliable, zero-carbon power.\n\nBefore joining RMI, Tyler was a senior associate at Synapse Energy Economics, where he consulted on issues across the clean energy transition, including resource planning, distributed energy resources, rate design, climate risk and stranded assets, and electrification. During his time at Synapse, he provided expert input to regulators in Nova Scotia, Missouri, Virginia, North Carolina, South Carolina, and Georgia, and his work has been cited by institutions including Bloomberg, S&P, and Business Insider.\n\nTyler was also a regulatory director at Vote Solar, where he led regulatory interventions to deploy cost-effective, accessible solar power in the Southeast. Earlier in his career he was a Climate Corps Fellow with the Environmental Defense Fund, a research analyst at ICF International, and a graduate consultant for Southern California Edison.\n\nHe received a Master's of Science from the University of Michigan's School for the Environment and Sustainability, with a focus on environmental policy and planning. His graduate work included developing accessible community solar business models in Detroit and a biomass-renewable hybrid microgrid in the Democratic Republic of Congo.\n\nHe's driven by the hope that our response to the climate crisis will create a more just and inclusive world.",
+  "education": [
+    {
+      "degree": "MS, Environmental Policy and Planning",
+      "school": "University of Michigan School for the Environment and Sustainability",
+      "focus": "Environmental policy, community solar, microgrid design"
+    },
+    {
+      "degree": "BS, Environmental Sciences",
+      "school": "University of North Carolina at Chapel Hill",
+      "focus": "Environmental science"
+    }
+  ],
+  "experience": [
+    {
+      "org": "RMI (Rocky Mountain Institute)",
+      "title": "Manager, Carbon-Free Electricity Practice",
+      "start": "2023",
+      "end": "present"
+    },
+    {
+      "org": "Synapse Energy Economics",
+      "title": "Senior Associate",
+      "start": "2020",
+      "end": "2023"
+    },
+    {
+      "org": "Vote Solar",
+      "title": "Regulatory Director, Southeast",
+      "start": "2020",
+      "end": "2020"
+    },
+    {
+      "org": "Environmental Defense Fund",
+      "title": "Climate Corps Fellow",
+      "start": "",
+      "end": ""
+    },
+    {
+      "org": "ICF International",
+      "title": "Research Analyst",
+      "start": "",
+      "end": ""
+    },
+    {
+      "org": "Southern California Edison",
+      "title": "Graduate Consultant",
+      "start": "",
+      "end": ""
+    }
+  ],
+  "contact": {
+    "email": "tyler@tyfi.computer",
+    "linkedin": "https://www.linkedin.com/in/ty-fi",
+    "github": "https://github.com/ty-fi"
+  },
+  "photo": "/images/headshot.jpg"
+}

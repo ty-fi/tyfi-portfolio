@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const url = new URL(Astro.request.url);
+const template: 'a' | 'b' | 'c' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : 'a';
+
+const allPress = await getCollection('press');
+const sorted = allPress.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const kinds = Array.from(new Set(allPress.map((p) => p.data.kind))).sort();
+const outlets = Array.from(new Set(allPress.map((p) => p.data.outlet))).sort();
+
+const kindLabel: Record<string, string> = {
+  citation: 'Citation',
+  interview: 'Interview / Quote',
+  'conference-talk': 'Conference talk / panel',
+  podcast: 'Podcast',
+  video: 'Video',
+};
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<Base
+  title="Press"
+  description="Press appearances, citations, interviews, and conference talks by Tyler Fitch."
+  template={template}
+>
+  <div class="container">
+    <section style="margin-bottom: 2rem;">
+      <h1>Press & media</h1>
+      <p style="color: var(--a-ink-soft); max-width: 32rem; margin-top: 0.5rem;">
+        News articles that cite my work, interviews and quotes, and conference talks or panels.
+      </p>
+    </section>
+
+    {sorted.length === 0 ? (
+      <p style="font-style: italic; color: var(--a-ink-soft);">No press entries yet. Add one by creating a Markdown file in <code>src/content/press/</code>.</p>
+    ) : (
+      <>
+        <div class="tabs" data-tabs>
+          <button class="active" data-tab="all">All ({sorted.length})</button>
+          {kinds.map((k) => (
+            <button data-tab={k}>{kindLabel[k] || k} ({sorted.filter((p) => p.data.kind === k).length})</button>
+          ))}
+        </div>
+
+        {outlets.length > 1 && (
+          <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.5rem;">By outlet</div>
+            <div class="filter-bar" data-filter data-field="outlet">
+              <button class="chip active" data-value="">All</button>
+              {outlets.map((o) => <button class="chip" data-value={o}>{o}</button>)}
+            </div>
+          </div>
+        )}
+
+        <ul class="press-list" data-list>
+          {sorted.map((p) => (
+            <li
+              class="press-item"
+              data-kind={p.data.kind}
+              data-outlet={p.data.outlet}
+            >
+              <div class="press-head">
+                <div>
+                  <div class="outlet">{p.data.outlet} · {kindLabel[p.data.kind] || p.data.kind}</div>
+                  <h3><a href={p.data.url}>{p.data.title}</a></h3>
+                </div>
+                <span class="date">{fmt(p.data.date)}</span>
+              </div>
+              {p.data.quote && <div class="quote">"{p.data.quote}"</div>}
+              {p.data.summary && <p style="margin-top: 0.75rem; color: var(--a-ink-soft); font-size: 0.9375rem;">{p.data.summary}</p>}
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </div>
+</Base>
+
+<script>
+  const state = { tab: 'all', outlet: '' };
+  const apply = () => {
+    document.querySelectorAll('[data-list] .press-item').forEach((el) => {
+      const k = el.getAttribute('data-kind');
+      const o = el.getAttribute('data-outlet');
+      const okT = state.tab === 'all' || k === state.tab;
+      const okO = !state.outlet || o === state.outlet;
+      (el as HTMLElement).style.display = okT && okO ? '' : 'none';
+    });
+  };
+  document.querySelectorAll('[data-tabs] button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-tabs] button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.tab = (btn as HTMLElement).getAttribute('data-tab') || 'all';
+      apply();
+    });
+  });
+  document.querySelectorAll('[data-filter]').forEach((group) => {
+    const field = (group as HTMLElement).getAttribute('data-field') as keyof typeof state;
+    group.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state[field] = (btn as HTMLElement).getAttribute('data-value') || '';
+        apply();
+      });
+    });
+  });
+</script>

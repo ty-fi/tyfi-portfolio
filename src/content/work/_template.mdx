@@ -1,0 +1,54 @@
+---
+# Template for a new work entry.
+# Copy this file to src/content/work/<slug>.mdx (or .md), fill in the
+# frontmatter, and write a body. Supports MDX (components inside markdown)
+# and standard Markdown.
+#
+# You can reference other work in the corpus from the body using the
+# wikilink syntax [[other-work-slug]] or [[display text|other-work-slug]].
+# At build time, every page that is referenced will list this work as a
+# backlink at the bottom of the detail page.
+
+title: "Full title of the work"
+type: testimony # or: report, white-paper, brief, article, thesis, comment
+date: 2024-01-15
+employer: "Organization where you worked on this" # e.g. RMI, Synapse, Vote Solar
+client: "Client on whose behalf the work was done" # e.g. Vote Solar, Sierra Club
+jurisdiction: "North Carolina" # only for regulatory testimony
+docket_no: "E-100, Sub 179" # only for regulatory testimony
+topics:
+  - resource-planning
+  - climate-risk
+categories: # free-form categories for filtering — can be more specific than type
+  - testimony
+  - north-carolina
+  - carbon-plan
+coauthors: [] # e.g. ["James Van Nostrand"]
+summary: "One-paragraph abstract or summary of the work. Plain text, ~2-3 sentences."
+pdf_url: "/files/your-filename.pdf" # local file (place in public/files/)
+canonical_url: "https://example.com/canonical-link" # optional external canonical URL
+featured: false # set to true to surface on the home page
+---
+
+## Overview
+
+Optional longer-form body, written in Markdown (or MDX for components). This
+is what shows on the work detail page below the metadata block. Use it for
+an abstract, key findings, methodology, or anything else that helps a reader
+understand the work.
+
+You can use any standard Markdown: headings, lists, **bold**, _italics_,
+[links](https://example.com), blockquotes, code, etc.
+
+Because this file is `.mdx`, you can also import and use Astro components
+inline — for example to embed an interactive chart, a related-press block,
+or a citation graph.
+
+### Cross-references
+
+Link to other works in the corpus using wikilink syntax:
+
+- Plain: `[[rewiring-utility-planning]]` → renders as a link to that work
+- Aliased: `[[the Rewiring report|rewiring-utility-planning]]` → "the Rewiring report"
+
+These will appear as backlinks on the target page.

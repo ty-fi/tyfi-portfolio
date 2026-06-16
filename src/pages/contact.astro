@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import authorData from '../content/author/tyler.json';
+
+const url = new URL(Astro.request.url);
+const template: 'a' | 'b' | 'c' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : 'a';
+
+const { contact } = authorData;
+---
+
+<Base
+  title="Contact"
+  description="Get in touch with Tyler Fitch."
+  template={template}
+>
+  <div class="container">
+    <section style="margin-bottom: 2rem;">
+      <h1>Contact</h1>
+      <p style="color: var(--a-ink-soft); max-width: 32rem; margin-top: 0.5rem;">
+        The best ways to reach me.
+      </p>
+    </section>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 32rem;">
+      {contact.email && (
+        <div>
+          <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.25rem;">Email</div>
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        </div>
+      )}
+      {contact.linkedin && (
+        <div>
+          <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.25rem;">LinkedIn</div>
+          <a href={contact.linkedin}>{contact.linkedin.replace('https://', '')}</a>
+        </div>
+      )}
+      {contact.github && (
+        <div>
+          <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--a-ink-soft); margin-bottom: 0.25rem;">GitHub</div>
+          <a href={contact.github}>{contact.github.replace('https://', '')}</a>
+        </div>
+      )}
+    </div>
+
+    <p style="margin-top: 3rem; font-style: italic; color: var(--a-ink-soft); max-width: 32rem;">
+      For expert witness engagements, regulatory consulting, or media inquiries, please use the email above. For work on the site itself, see the <a href="https://github.com/ty-fi/tyfi-portfolio">GitHub repo</a>.
+    </p>
+  </div>
+</Base>
