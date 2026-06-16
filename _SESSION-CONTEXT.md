@@ -2,10 +2,10 @@
 
 ## At a Glance
 **Objective:** Build a charming, professional portfolio website for Tyler Fitch (energy researcher) that serves as a queryable repository of his published works and a polished public face for professional audiences.
-**Status:** Site is built, dev server running on :4322, all 4 templates + masonry + MDX + backlinks + categories working. Awaiting user review of design.
-**Last session:** Iteration round 2 — added MDX support, masonry grid, backlinks system, 4th template (Amber Terminal with triangle-shows palette + Maggie's masonry), categories field, renamed /works → /work, created scraper-plan.md.
-**Next:** User review of design — visit all 4 templates, verify backlinks, decide default, commit & push to GitHub.
-**User Actions Needed:** (1) Visually compare all 4 templates at `/?tpl=a|b|c|d`. (2) Verify backlinks on `/work/carbon-stranding-briefing-2021`. (3) Pick a default template (A is current default). (4) Create `ty-fi/tyfi-portfolio` GitHub repo + DNS for `tyfi.computer` to deploy. (5) Any permission asks deferred from this session, see "Deferred Questions" below.
+**Status:** ✅ LIVE at `https://ty-fi.github.io/tyfi-portfolio/` — repo created, all commits pushed, deploy workflow passing.
+**Last session:** Created GitHub repo at `ty-fi/tyfi-portfolio` via `gh`, enabled GitHub Pages, fixed a missing file (template-switcher.css) that wasn't committed earlier, pushed, and the site is now serving all 4 templates with working backlinks.
+**Next:** User to point `tyfi.computer` DNS at `ty-fi.github.io` to use the custom domain (or keep using the github.io URL). The `public/CNAME` file already contains `tyfi.computer`.
+**User Actions Needed:** (1) DNS: add a CNAME for `tyfi.computer` → `ty-fi.github.io`. (2) In repo Settings → Pages → Custom domain: type `tyfi.computer` to wire it up. (3) Any template choice / content review at your leisure.
 
 ---
 
@@ -99,6 +99,15 @@ npm run deploy
 5. **Categories free-form vs controlled** — categories is currently free-form (Tyler can put anything). If a controlled vocabulary is preferred, I can add an enum to the schema.
 6. **GitHub repo still not created** — `git init` was run, files staged, but the remote repo at `github.com/ty-fi/tyfi-portfolio` doesn't exist yet, so no push has happened. Awaiting user.
 7. **DNS for `tyfi.computer`** — still pointing at the old Tumblr site. Awaiting registrar update.
+
+## Bugs found and fixed during iteration
+
+### Template switch not rendering (FIXED in commit c7eef48)
+- **Symptom**: Visiting `/?tpl=d` rendered Template A (cream paper, serif), not Template D (Amber Terminal, dark, monospace, masonry).
+- **Root cause**: Astro's dev server (and static SSG) drops the query string from the request URL before passing it to the page's frontmatter. The `Astro.request.url` and `new URLSearchParams(...)` calls were always reading the bare path (e.g., `/`), not `/?tpl=d`. Debug log proved this: every request logged `request URL: http://localhost:4321/` regardless of query string.
+- **Fix**: Moved template detection to a synchronous inline `<script is:inline>` in the head of `Base.astro`. The script reads `?tpl=` from `window.location.search` and sets the body class. CSS rules in `src/styles/template-switcher.css` show/hide the appropriate content blocks based on the body class.
+- **Trade-off**: There's a one-frame flash of Template A's styles before the script runs and switches. Acceptable for a workshop tool. To eliminate it, would need a server-rendered approach.
+- **Affected files**: `Base.astro` (inline script, removed `template` prop), `index.astro` (rendered both A/B/C content variants and D masonry block), `work/index.astro` / `work/[slug].astro` / `press.astro` / `about.astro` (removed `template` prop and `Astro.request.url` logic), `template-switcher.css` (new file with show/hide rules).
 
 ## Last Task Completed
 GitHub Actions deploy + check workflows added; session context updated; site builds clean.
