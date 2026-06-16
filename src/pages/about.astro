@@ -2,9 +2,6 @@
 import Base from '../layouts/Base.astro';
 import authorData from '../content/author/tyler.json';
 
-const url = new URL(Astro.request.url);
-const template: 'a' | 'b' | 'c' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : 'a';
-
 const { bio_long, education, experience, current_role } = authorData;
 const paragraphs = bio_long.split('\n\n');
 ---
@@ -12,13 +9,12 @@ const paragraphs = bio_long.split('\n\n');
 <Base
   title={`About — ${authorData.name}`}
   description={`About ${authorData.name}: ${authorData.headline}`}
-  template={template}
 >
   <div class="container">
     <section class="about-header">
       <div>
         <h1>About</h1>
-        {template === 'c' && <p class="meta">{current_role.title}, {current_role.org}</p>}
+        <p class="tpl-meta-c">{current_role.title}, {current_role.org}</p>
       </div>
       {authorData.photo && <img src={authorData.photo} alt={authorData.name} class="portrait" />}
     </section>
@@ -27,41 +23,31 @@ const paragraphs = bio_long.split('\n\n');
       {paragraphs.map((p) => <p>{p}</p>)}
     </section>
 
-    {template !== 'c' && <h2 style={template === 'a' ? 'font-style: italic; font-weight: 500; font-size: 1.4375rem; margin-top: 3rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--' + template + '-rule);' : ''}>Experience</h2>}
-
-    {template === 'a' && <h2 class="small-caps" style="font-size: 1rem; margin-top: 3rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--a-rule);">Experience</h2>}
-
-    {template === 'c' && <h2>Experience</h2>}
+    <h2 class="tpl-h2-a tpl-h2-b">Experience</h2>
+    <h2 class="tpl-h2-c">Experience</h2>
 
     <ul class="timeline">
       {experience.map((e) => (
         <li>
           <span class="when">{e.start}{e.end ? `–${e.end}` : ''}</span>
           <span class="what">
-            {template === 'c' ? (
-              <><em>{e.title}</em>, {e.org}</>
-            ) : (
-              <><strong>{e.title}</strong> <span class="where">· {e.org}</span></>
-            )}
+            <span class="tpl-strong-a tpl-strong-b"><strong>{e.title}</strong> <span class="where">· {e.org}</span></span>
+            <span class="tpl-em-c"><em>{e.title}</em>, {e.org}</span>
           </span>
         </li>
       ))}
     </ul>
 
-    {template === 'a' && <h2 class="small-caps" style="font-size: 1rem; margin-top: 3rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--a-rule);">Education</h2>}
-    {template === 'b' && <h2 style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--b-ink-soft); margin-top: 3rem; margin-bottom: 1rem; font-weight: 500;">Education</h2>}
-    {template === 'c' && <h2>Education</h2>}
+    <h2 class="tpl-h2-a tpl-h2-b">Education</h2>
+    <h2 class="tpl-h2-c">Education</h2>
 
     <ul class="timeline">
       {education.map((ed) => (
         <li>
           <span class="when"></span>
           <span class="what">
-            {template === 'c' ? (
-              <><em>{ed.degree}</em>, {ed.school}.{ed.focus && <span class="where"> {ed.focus}.</span>}</>
-            ) : (
-              <><strong>{ed.degree}</strong> <span class="where">· {ed.school}</span>{ed.focus && <div class="where" style="font-size: 0.875rem;">{ed.focus}</div>}</>
-            )}
+            <span class="tpl-strong-a tpl-strong-b"><strong>{ed.degree}</strong> <span class="where">· {ed.school}</span>{ed.focus && <div class="where" style="font-size: 0.875rem;">{ed.focus}</div>}</span>
+            <span class="tpl-em-c"><em>{ed.degree}</em>, {ed.school}.{ed.focus && <span class="where"> {ed.focus}.</span>}</span>
           </span>
         </li>
       ))}

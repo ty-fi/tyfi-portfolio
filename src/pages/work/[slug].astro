@@ -17,8 +17,6 @@ interface Props {
 
 const { entry, allWork } = Astro.props;
 const { Content } = await entry.render();
-const url = new URL(Astro.request.url);
-const template: 'a' | 'b' | 'c' | 'd' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : url.searchParams.get('tpl') === 'd' ? 'd' : 'a';
 
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -80,14 +78,13 @@ const backlinks = allWork
 <Base
   title={`${entry.data.title} — Tyler Fitch`}
   description={entry.data.summary}
-  template={template}
 >
   <div class="container">
     <article class="work-detail">
       <a href="/work" class="back">← All work</a>
       <header>
         <h1>{entry.data.title}</h1>
-        <p class="lead" style={template === 'a' ? 'font-style: italic; color: var(--a-ink-soft);' : ''}>{entry.data.summary}</p>
+        <p class="lead" style="font-style: italic; color: var(--a-ink-soft);">{entry.data.summary}</p>
       </header>
 
       <dl class="work-facts">

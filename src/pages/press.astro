@@ -2,8 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const url = new URL(Astro.request.url);
-const template: 'a' | 'b' | 'c' = url.searchParams.get('tpl') === 'b' ? 'b' : url.searchParams.get('tpl') === 'c' ? 'c' : 'a';
+// Template is read client-side via Base.astro's inline script.
 
 const allPress = await getCollection('press');
 const sorted = allPress.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -25,7 +24,6 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 <Base
   title="Press"
   description="Press appearances, citations, interviews, and conference talks by Tyler Fitch."
-  template={template}
 >
   <div class="container">
     <section style="margin-bottom: 2rem;">
