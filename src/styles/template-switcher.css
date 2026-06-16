@@ -1,0 +1,79 @@
+/* ============================================================
+   TEMPLATE SWITCHER
+   Controls which content/elements are visible for each template.
+   The body class is set by an inline script in Base.astro that
+   reads `?tpl=` from the URL.
+
+   Default (no class / template-a-page): show Template A's content.
+   ============================================================ */
+
+/* --- Home page: variant hero / list / lede per template --- */
+
+/* Headlines */
+.tpl-h1-a, .tpl-h1-b, .tpl-h1-c { display: none; }
+.template-a-page .tpl-h1-a,
+.template-b-page .tpl-h1-b,
+.template-c-page .tpl-h1-c { display: block; }
+
+/* Ledes */
+.tpl-lede-a, .tpl-lede-b, .tpl-lede-c { display: none; }
+.template-a-page .tpl-lede-a,
+.template-b-page .tpl-lede-b,
+.template-c-page .tpl-lede-c { display: block; }
+
+/* Section headings */
+.tpl-h2-a, .tpl-h2-b, .tpl-h2-c { display: none; }
+.template-a-page .tpl-h2-a,
+.template-a-page .tpl-h2-b,
+.template-b-page .tpl-h2-a,
+.template-b-page .tpl-h2-b,
+.template-c-page .tpl-h2-c { display: block; }
+
+/* Work list variants */
+.tpl-list-a, .tpl-list-b, .tpl-list-c { display: none; }
+.template-a-page .tpl-list-a,
+.template-b-page .tpl-list-b,
+.template-c-page .tpl-list-c { display: block; }
+
+/* Press list variants — A and B share .press-list; C uses citation-list */
+.template-a-page .tpl-list-a,
+.template-b-page .tpl-list-b { display: block; }
+.template-c-page .tpl-list-c { display: block; }
+
+/* --- Template D visibility: hide shared, show d-only --- */
+.template-d-page .tpl-shared { display: none; }
+.template-d-page .tpl-d-only { display: block; }
+.template-a-page .tpl-d-only,
+.template-b-page .tpl-d-only,
+.template-c-page .tpl-d-only { display: none; }
+
+/* Inverse for the shared block */
+.template-a-page .tpl-shared,
+.template-b-page .tpl-shared,
+.template-c-page .tpl-shared { display: block; }
+.template-d-page .tpl-shared { display: none; }
+
+/* --- About page: variant labels, strong/em, meta-c --- */
+
+/* Section heading variants on About */
+.tpl-h2-a, .tpl-h2-b, .tpl-h2-c { display: none; }
+.template-a-page .tpl-h2-a,
+.template-b-page .tpl-h2-b,
+.template-c-page .tpl-h2-c { display: block; }
+
+/* Meta-c (current role) only on template C */
+.tpl-meta-c { display: none; }
+.template-c-page .tpl-meta-c { display: block; }
+
+/* Strong (templates A/B) vs em (template C) for timeline entries */
+.tpl-strong-a, .tpl-strong-b, .tpl-em-c { display: none; }
+.template-a-page .tpl-strong-a,
+.template-b-page .tpl-strong-b { display: inline; }
+.template-c-page .tpl-em-c { display: inline; }
+
+/* Work detail page: coauthors variant (template A uses comma list, B uses bullets) */
+/* For now the same .dd markup works across templates; variant logic only applies if needed */
+.tpl-only-a, .tpl-only-b, .tpl-only-c { display: none; }
+.template-a-page .tpl-only-a,
+.template-b-page .tpl-only-b,
+.template-c-page .tpl-only-c { display: revert; }
