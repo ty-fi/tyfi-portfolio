@@ -25,3 +25,4 @@ pnpm-debug.log*
 _*.md
 !_PLAN.md
 !_SESSION-CONTEXT.md
+.claude-bash-history.jsonl
