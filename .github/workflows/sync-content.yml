@@ -90,16 +90,6 @@ jobs:
 
           echo "::notice::Added: $added_count, Updated: $updated_count, Skipped: ${#skipped[@]}"
 
-      - name: Ensure content-sync label exists
-        if: steps.sync.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create content-sync \
-            --color "0e8a16" \
-            --description "Automated content sync from ty-fi/tyfi-content" \
-            --force
-
       - name: Open sync PR
         if: steps.sync.outputs.has_changes == 'true'
         env:
