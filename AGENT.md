@@ -130,16 +130,31 @@ To change the default template: edit the fallback in the inline script in `Base.
 
 Canonical content lives in **`ty-fi/tyfi-content`** — a standalone Obsidian
 vault with git. Works and press entries are authored there (QuickAdd or
-`node scripts/cli.js`), then synced to `src/content/work/` and
-`src/content/press/` here. Frontmatter schemas are identical across both repos.
+`node scripts/cli.js`). The two repos are kept in sync by
+`.github/workflows/sync-content.yml` (every 6h, on `workflow_dispatch`, or on
+a `repository_dispatch` event of type `content-updated`). The sync opens a PR
+here; merging publishes via `deploy.yml`.
+
+**File mapping** (driven by `sync-content.yml`):
+
+| tyfi-content | → | this repo |
+|---|---|---|
+| `works/*.md` | → | `src/content/work/` |
+| `press/*.md` | → | `src/content/press/` |
+| `pdfs/*` | → | `public/files/` |
+
+Frontmatter schemas are intentionally identical across both repos. `_*` files
+in `tyfi-content` are skipped. The sync **adds/updates only** — deletions
+must be made directly in this repo.
 
 ## How to Add Content
 
-**Preferred path:** Use `ty-fi/tyfi-content` (Obsidian QuickAdd or CLI), copy
-the resulting `.md` file into `src/content/work/` or `src/content/press/`,
-commit and push.
+**Preferred path:** Use `ty-fi/tyfi-content` (Obsidian QuickAdd or CLI), commit
+and push there. The sync workflow will open a PR here within ~6h; merge it to
+publish. To trigger immediately, run the `Sync content from tyfi-content`
+workflow from the Actions tab.
 
-**Direct fallback:**
+**Direct fallback** (when tyfi-content is unavailable):
 1. Copy `src/content/work/_template.mdx` → new file, fill required frontmatter
 2. Commit & push → auto-deploys
 
@@ -155,6 +170,14 @@ Push to `main` → `.github/workflows/deploy.yml` runs:
 3. Uploads `dist` to GitHub Pages → live at `tyfi.computer`
 
 No staging environment. The `check.yml` workflow runs a build check on PRs.
+The `sync-content.yml` workflow pulls content from `ty-fi/tyfi-content` and
+opens a PR; merging that PR triggers the normal deploy.
+
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| `check.yml` | PR/push to `main` | Build validation |
+| `deploy.yml` | push to `main`, `workflow_dispatch` | Publish to GitHub Pages |
+| `sync-content.yml` | every 6h, `workflow_dispatch`, `repository_dispatch:content-updated` | Open PR syncing from tyfi-content |
 
 ---
 

@@ -15,20 +15,31 @@ npm run preview    # preview the production build locally
 
 ## Content management
 
-Content (works and press entries) is now managed in a separate repo:
+Content (works and press entries) is managed in a separate repo:
 **[`ty-fi/tyfi-content`](https://github.com/ty-fi/tyfi-content)** — an Obsidian vault with
 git version control. To add new content:
 
 1. Open `tyfi-content` in Obsidian and use **QuickAdd → Add Content**, or run
    `node scripts/cli.js` from that repo's root.
-2. After adding and committing there, copy the new `.md` files into this repo:
-   - `tyfi-content/works/*.md` → `src/content/work/`
-   - `tyfi-content/press/*.md` → `src/content/press/`
-   - Any PDFs → `public/files/`
-3. Commit and push here — GitHub Actions deploys automatically.
+2. Commit and push there.
 
-> **Future:** A git submodule or GitHub Action can automate step 2. See
-> `ty-fi/tyfi-content` README for details.
+The rest is automated. A scheduled GitHub Action (`.github/workflows/sync-content.yml`)
+runs every 6 hours, diffs the two repos, and opens a PR here with any new or
+updated files. Merge the PR to publish via `deploy.yml`. You can also trigger a
+sync on demand from the Actions tab.
+
+**File mapping:**
+
+| tyfi-content | → | this repo |
+|---|---|---|
+| `works/*.md` | → | `src/content/work/` |
+| `press/*.md` | → | `src/content/press/` |
+| `pdfs/*` | → | `public/files/` |
+
+`_*` files in tyfi-content (`_INDEX.md`, `_template.md`) are skipped, and the
+matching portfolio files (`_template.mdx`, `_example-mdx.mdx`) are preserved.
+Deletions are **not** propagated — to remove a published entry, delete it in
+this repo directly.
 
 ### Adding directly in this repo (fallback)
 
