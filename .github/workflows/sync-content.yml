@@ -72,23 +72,23 @@ jobs:
             done < <(find "../$src" -type f -print0)
           done
 
-          added_count=${#added[@]:-0}
-          updated_count=${#updated[@]:-0}
+          added_count=${#added[@]}
+          updated_count=${#updated[@]}
           has_changes=$([ "$added_count" -gt 0 ] || [ "$updated_count" -gt 0 ] && echo true || echo false)
 
           {
             echo "added<<EOF"
-            printf -- '- %s\n' "${added[@]:-}"
+            printf -- '- %s\n' "${added[@]}"
             echo "EOF"
             echo "updated<<EOF"
-            printf -- '- %s\n' "${updated[@]:-}"
+            printf -- '- %s\n' "${updated[@]}"
             echo "EOF"
             echo "added_count=$added_count"
             echo "updated_count=$updated_count"
             echo "has_changes=$has_changes"
           } >> "$GITHUB_OUTPUT"
 
-          echo "::notice::Added: $added_count, Updated: $updated_count, Skipped: ${#skipped[@]:-0}"
+          echo "::notice::Added: $added_count, Updated: $updated_count, Skipped: ${#skipped[@]}"
 
       - name: Open sync PR
         if: steps.sync.outputs.has_changes == 'true'
