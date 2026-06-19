@@ -16,7 +16,7 @@ const paragraphs = bio_long.split('\n\n');
         <h1>About</h1>
         <p class="tpl-meta-c">{current_role.title}, {current_role.org}</p>
       </div>
-      {authorData.photo && <img src={authorData.photo} alt={authorData.name} class="portrait" />}
+      {authorData.photo && <img src={`${import.meta.env.BASE_URL}${authorData.photo.replace(/^\//, '')}`} alt={authorData.name} class="portrait" />}
     </section>
 
     <section>

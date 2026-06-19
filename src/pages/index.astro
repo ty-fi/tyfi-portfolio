@@ -41,11 +41,11 @@ const fmt = (d: Date) =>
       <p class="lede tpl-lede-b">I'm an energy researcher and expert witness focused on resource planning, rate design, climate risk, and the clean energy transition in the U.S. Southeast. Currently a manager at <a href="https://rmi.org/bios/tyler-fitch/">RMI</a>.</p>
       <p class="lede tpl-lede-c">{authorData.bio_short}</p>
       <p style="margin-top: 1.5rem;" class="tpl-links">
-        <a href="/work">View work →</a>
+        <a href={`${import.meta.env.BASE_URL}/work`}>View work →</a>
         &nbsp;&nbsp;
-        <a href="/about">About</a>
+        <a href={`${import.meta.env.BASE_URL}/about`}>About</a>
         &nbsp;&nbsp;
-        <a href="/contact">Get in touch</a>
+        <a href={`${import.meta.env.BASE_URL}/contact`}>Get in touch</a>
       </p>
     </section>
 
@@ -53,14 +53,14 @@ const fmt = (d: Date) =>
       <div class="section-heading">
         <h2 class="tpl-h2-a tpl-h2-b">Featured work</h2>
         <h2 class="tpl-h2-c">Selected Work</h2>
-        <a class="more" href="/work">All work</a>
+        <a class="more" href={`${import.meta.env.BASE_URL}/work`}>All work</a>
       </div>
       <ul class="tpl-list-a work-list">
         {featured.map((w) => (
           <li class="work-item">
             <div class="date">{w.data.date.getFullYear()}</div>
             <div>
-              <h3><a href={`/work/${w.slug}`}>{w.data.title}</a></h3>
+              <h3><a href={`${import.meta.env.BASE_URL}/work/${w.slug}`}>{w.data.title}</a></h3>
               <p class="summary">{w.data.summary}</p>
               <div class="work-meta">
                 {w.data.employer}{w.data.jurisdiction && ` · ${w.data.jurisdiction}`}{w.data.docket_no && ` · ${w.data.docket_no}`}
@@ -73,7 +73,7 @@ const fmt = (d: Date) =>
         {recent.map((w) => (
           <li>
             <span class="date">{fmt(w.data.date)}</span>
-            <span class="title"><a href={`/work/${w.slug}`}>{w.data.title}</a></span>
+            <span class="title"><a href={`${import.meta.env.BASE_URL}/work/${w.slug}`}>{w.data.title}</a></span>
             <span class="tag">— {w.data.type}{w.data.jurisdiction ? ` · ${w.data.jurisdiction}` : ''}</span>
             <span class="summary">{w.data.summary}</span>
           </li>
@@ -84,7 +84,7 @@ const fmt = (d: Date) =>
           <li class="citation-item">
             <span class="year">{w.data.date.getFullYear()}</span>
             <span>
-              <span class="title"><a href={`/work/${w.slug}`}>{w.data.title}</a></span>
+              <span class="title"><a href={`${import.meta.env.BASE_URL}/work/${w.slug}`}>{w.data.title}</a></span>
               <span class="where"> — {w.data.employer}{w.data.jurisdiction ? `, ${w.data.jurisdiction}` : ''}{w.data.docket_no ? `, ${w.data.docket_no}` : ''}.</span>
               <span class="summary">{w.data.summary}</span>
             </span>
@@ -98,7 +98,7 @@ const fmt = (d: Date) =>
         <div class="section-heading">
           <h2 class="tpl-h2-a tpl-h2-b">In the press</h2>
           <h2 class="tpl-h2-c">Press &amp; Citations</h2>
-          <a class="more" href="/press">All press</a>
+          <a class="more" href={`${import.meta.env.BASE_URL}/press`}>All press</a>
         </div>
         <ul class="tpl-list-a tpl-list-b press-list">
           {recentPress.map((p) => (
@@ -137,7 +137,7 @@ const fmt = (d: Date) =>
       <h1 class="hero-name">Tyler Fitch</h1>
       <p class="lede">// {authorData.bio_short}</p>
       <p class="lede" style="margin-top: 0.75rem; color: var(--d-muted); font-style: normal;">
-        &gt; <a href="/work">/work</a> &nbsp; <a href="/press">/press</a> &nbsp; <a href="/about">/about</a> &nbsp; <a href="/contact">/contact</a>
+        &gt; <a href={`${import.meta.env.BASE_URL}/work`}>/work</a> &nbsp; <a href={`${import.meta.env.BASE_URL}/press`}>/press</a> &nbsp; <a href={`${import.meta.env.BASE_URL}/about`}>/about</a> &nbsp; <a href={`${import.meta.env.BASE_URL}/contact`}>/contact</a>
       </p>
     </section>
 
@@ -145,7 +145,7 @@ const fmt = (d: Date) =>
       <div class="filter-label">// featured</div>
       <div class="masonry">
         {featured.map((w) => (
-          <a href={`/work/${w.slug}`} class="masonry-card" data-kind={w.data.type}>
+          <a href={`${import.meta.env.BASE_URL}/work/${w.slug}`} class="masonry-card" data-kind={w.data.type}>
             <div class="card-kind">{w.data.type}</div>
             <h3 class="card-title">{w.data.title}</h3>
             <div class="card-meta">

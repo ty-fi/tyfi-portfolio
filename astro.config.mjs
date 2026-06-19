@@ -3,6 +3,7 @@ import mdx from '@astrojs/mdx';
 
 export default defineConfig({
   site: 'https://tyfi.computer',
+  base: process.env.PAGES_BASE ?? '/tyfi-portfolio',
   output: 'static',
   build: {
     format: 'directory',
