@@ -13,55 +13,35 @@ npm run build      # production build to ./dist
 npm run preview    # preview the production build locally
 ```
 
-## Adding a new work (testimony, report, article, etc.)
+## Content management
 
-1. Drop the PDF into `public/files/` (e.g. `my-testimony.pdf`).
-2. Copy the template:
-   ```powershell
-   Copy-Item src\content\work\_template.mdx src\content\work\my-testimony.mdx
-   ```
-3. Open the new file and fill in the YAML frontmatter. Required fields:
-   - `title` — full title of the work
-   - `type` — one of: `testimony`, `report`, `white-paper`, `brief`, `article`, `thesis`, `comment`
-   - `date` — date filed / published
-   - `summary` — 2-3 sentence abstract
-4. Optional fields: `employer`, `client`, `jurisdiction`, `docket_no`, `topics`, `categories`, `coauthors`, `pdf_url`, `canonical_url`, `featured`
-5. Write the body in Markdown or MDX (optional — most entries can have an empty body if the summary is enough).
-6. Reference other works with the wikilink syntax `[[other-slug]]` or `[[display text|other-slug]]`. The target work's page will automatically list this work as a backlink.
-7. Commit and push:
-   ```powershell
-   git add .
-   git commit -m "Add: [title]"
-   git push
-   ```
-8. GitHub Actions rebuilds and deploys automatically.
+Content (works and press entries) is now managed in a separate repo:
+**[`ty-fi/tyfi-content`](https://github.com/ty-fi/tyfi-content)** — an Obsidian vault with
+git version control. To add new content:
 
-### What is "categories"?
+1. Open `tyfi-content` in Obsidian and use **QuickAdd → Add Content**, or run
+   `node scripts/cli.js` from that repo's root.
+2. After adding and committing there, copy the new `.md` files into this repo:
+   - `tyfi-content/works/*.md` → `src/content/work/`
+   - `tyfi-content/press/*.md` → `src/content/press/`
+   - Any PDFs → `public/files/`
+3. Commit and push here — GitHub Actions deploys automatically.
 
-`categories` is a free-form array of short labels used for filtering on the
-work index page. Use it however makes sense to you — some overlap with
-`type` is fine, and you can add topical or thematic categories as well.
-Example:
+> **Future:** A git submodule or GitHub Action can automate step 2. See
+> `ty-fi/tyfi-content` README for details.
 
-```yaml
-type: testimony             # structured field, used for top-level tabs
-categories:                 # free-form tags, used for filter chips
-  - testimony
-  - north-carolina
-  - duke-energy
-  - carbon-risk
-```
+### Adding directly in this repo (fallback)
 
-## Adding a press / media appearance
+If you need to add content without going through tyfi-content:
 
-1. Copy the template:
-   ```powershell
-   Copy-Item src\content\press\_template.md src\content\press\my-article.md
-   ```
-2. Fill the frontmatter. Required: `title`, `outlet`, `date`, `kind`, `url`.
-3. `kind` is one of: `citation`, `interview`, `conference-talk`, `podcast`, `video`.
-4. Optional: `quote` (pull-quote), `related_work` (slug of a related works entry), `summary`.
-5. Commit and push.
+**New work:** Copy `src/content/work/_template.mdx` to a new file, fill
+required frontmatter (`title`, `type`, `date`, `summary`), commit and push.
+
+**New press entry:** Copy `src/content/press/_template.md`, fill required
+fields (`title`, `outlet`, `date`, `kind`, `url`), commit and push.
+
+The frontmatter schemas in `src/content/config.ts` are intentionally identical
+to tyfi-content's format — files are interchangeable between repos.
 
 ## Updating your bio
 

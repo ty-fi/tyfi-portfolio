@@ -126,18 +126,22 @@ To change the default template: edit the fallback in the inline script in `Base.
 
 ---
 
+## Content Source
+
+Canonical content lives in **`ty-fi/tyfi-content`** — a standalone Obsidian
+vault with git. Works and press entries are authored there (QuickAdd or
+`node scripts/cli.js`), then synced to `src/content/work/` and
+`src/content/press/` here. Frontmatter schemas are identical across both repos.
+
 ## How to Add Content
 
-**New work entry:**
-1. Add PDF to `public/files/`
-2. Copy `src/content/work/_template.mdx` → `src/content/work/my-slug.md(x)`
-3. Fill required frontmatter (`title`, `type`, `date`, `summary`)
-4. Commit & push → auto-deploys
+**Preferred path:** Use `ty-fi/tyfi-content` (Obsidian QuickAdd or CLI), copy
+the resulting `.md` file into `src/content/work/` or `src/content/press/`,
+commit and push.
 
-**New press entry:**
-1. Copy `src/content/press/_template.md` → new file
-2. Fill required frontmatter (`title`, `outlet`, `date`, `kind`, `url`)
-3. Commit & push
+**Direct fallback:**
+1. Copy `src/content/work/_template.mdx` → new file, fill required frontmatter
+2. Commit & push → auto-deploys
 
 **Update bio / experience:** Edit `src/content/author/tyler.json` directly.
 
